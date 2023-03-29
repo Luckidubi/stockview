@@ -1,19 +1,25 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import finnHub from "../apis/finnHub";
-import {BsFillCaretDownFill, BsFillCaretUpFill} from 'react-icons/bs'
+import { BsFillCaretDownFill, BsFillCaretUpFill,BsFillTrash3Fill} from "react-icons/bs";
 import { useWatchList } from "../context/WatchListProvider";
+import { useNavigate } from "react-router-dom";
 function StockList() {
   const [stock, setStock] = useState();
-  const {watchList} = useWatchList()
+  const { watchList, deleteStock } = useWatchList();
+  const navigate = useNavigate();
 
   const changeColor = (change) => {
     return change > 0 ? "success" : "danger";
   };
 
-  const renderIcon = (change)=>{
-    return change > 0 ? <BsFillCaretUpFill/> : <BsFillCaretDownFill/>
-  }
+  const renderIcon = (change) => {
+    return change > 0 ? <BsFillCaretUpFill /> : <BsFillCaretDownFill />;
+  };
+
+  const handleStockSelect = (symbol) => {
+    navigate(`detail/${symbol}`);
+  };
   useEffect(() => {
     let isMounted = true;
     const fetchData = async () => {
@@ -48,11 +54,11 @@ function StockList() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [watchList]);
 
   return (
     <div>
-      StockList
+
       <table className="table hover mt-5">
         <thead>
           <tr>
@@ -69,7 +75,12 @@ function StockList() {
         <tbody>
           {stock?.map((stockData) => {
             return (
-              <tr className="table-row" key={stockData.symbol}>
+              <tr
+                style={{ cursor: "pointer" }}
+                onClick={() => handleStockSelect(stockData.symbol)}
+                className="table-row"
+                key={stockData.symbol}
+              >
                 <th scope="row">{stockData.symbol}</th>
                 <td>{stockData.data.c}</td>
                 <td className={`text-${changeColor(stockData.data.d)}`}>
@@ -83,7 +94,14 @@ function StockList() {
                 <td>{stockData.data.h}</td>
                 <td>{stockData.data.l}</td>
                 <td>{stockData.data.o}</td>
-                <td>{stockData.data.pc}</td>
+                <td>{stockData.data.pc} {" "}
+                <button className="btn btn-danger btn-sm ml-3 delete-button" onClick={(e)=>{
+                  e.stopPropagation()
+                  deleteStock(stockData.symbol)
+                }}>< BsFillTrash3Fill/></button>
+                </td>
+
+
               </tr>
             );
           })}
