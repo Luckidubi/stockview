@@ -1,13 +1,19 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import finnHub from "../apis/finnHub";
+import {BsFillCaretDownFill, BsFillCaretUpFill} from 'react-icons/bs'
+import { useWatchList } from "../context/WatchListProvider";
 function StockList() {
-  const [watchList, setWatchList] = useState(["GOOGL", "MSFT", "AMZN"]);
   const [stock, setStock] = useState();
+  const {watchList} = useWatchList()
 
   const changeColor = (change) => {
     return change > 0 ? "success" : "danger";
   };
+
+  const renderIcon = (change)=>{
+    return change > 0 ? <BsFillCaretUpFill/> : <BsFillCaretDownFill/>
+  }
   useEffect(() => {
     let isMounted = true;
     const fetchData = async () => {
@@ -68,9 +74,11 @@ function StockList() {
                 <td>{stockData.data.c}</td>
                 <td className={`text-${changeColor(stockData.data.d)}`}>
                   {stockData.data.d}
+                  {renderIcon(stockData.data.d)}
                 </td>
                 <td className={`text-${changeColor(stockData.data.dp)}`}>
                   {stockData.data.dp}
+                  {renderIcon(stockData.data.dp)}
                 </td>
                 <td>{stockData.data.h}</td>
                 <td>{stockData.data.l}</td>
